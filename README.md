@@ -6,7 +6,6 @@
 **Parameters:**  firstPlayerName, secondPlayerName  
 
 **PUT (/make-move/gameId)** - Сделать ход в игре.   
-**Parameters:** x, y, gameId
+**Parameters:** x, y
  
-**GET (/current-game-state/gameId)** - Получить текущее состояние игры.  
-**Parameters:** gameId
+**GET (/current-game-state/gameId)** - Получить текущее состояние игры. 
