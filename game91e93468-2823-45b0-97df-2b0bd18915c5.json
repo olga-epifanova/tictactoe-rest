@@ -1,0 +1,51 @@
+{"Gameplay": {
+    "Player": [
+        {
+            "symbol": "X",
+            "name": "Ольга",
+            "id": 1
+        },
+        {
+            "symbol": "O",
+            "name": "Игрок2",
+            "id": 2
+        }
+    ],
+    "Game": {"Step": [
+        {
+            "coordinateY": 2,
+            "coordinateX": 2,
+            "num": 1,
+            "playerId": "1"
+        },
+        {
+            "coordinateY": 1,
+            "coordinateX": 1,
+            "num": 2,
+            "playerId": "2"
+        },
+        {
+            "coordinateY": 1,
+            "coordinateX": 2,
+            "num": 3,
+            "playerId": "1"
+        },
+        {
+            "coordinateY": 3,
+            "coordinateX": 3,
+            "num": 4,
+            "playerId": "2"
+        },
+        {
+            "coordinateY": 3,
+            "coordinateX": 2,
+            "num": 5,
+            "playerId": "1"
+        }
+    ]},
+    "GameResult": {"Player": {
+        "symbol": "X",
+        "name": "Ольга",
+        "id": 1
+    }}
+}}

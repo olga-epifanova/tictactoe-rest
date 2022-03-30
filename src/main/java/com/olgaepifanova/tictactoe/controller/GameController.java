@@ -1,12 +1,12 @@
 package com.olgaepifanova.tictactoe.controller;
 
 import com.olgaepifanova.tictactoe.dto.CurrentGameState;
+import com.olgaepifanova.tictactoe.dto.GameHistory;
 import com.olgaepifanova.tictactoe.dto.GameResponse;
 import com.olgaepifanova.tictactoe.service.GameService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.UUID;
 
 @RestController
@@ -44,6 +44,13 @@ public class GameController {
 
         CurrentGameState currentGameState = service.getCurrentGameState(gameId);
         return ResponseEntity.ok(currentGameState);
+    }
+
+    // http://localhost:8080/gameplay/replay-game?fileName=game8c31a0b8-7b34-4b2d-ad6a-6d09edaf43f4.json
+    @GetMapping(value = "/replay-game")
+    public ResponseEntity<GameHistory> getGameHistory(@RequestParam String fileName) {
+        GameHistory gameHistory = service.getGameHistory(fileName);
+        return ResponseEntity.ok(gameHistory);
     }
 
 }
