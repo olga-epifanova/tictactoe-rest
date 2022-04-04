@@ -7,17 +7,23 @@ import java.util.ArrayList;
 
 public abstract class GameHistoryFile {
 
+    protected final long gameId;
     protected final Player firstPlayer;
     protected final Player secondPlayer;
     protected final ArrayList<Step> steps = new ArrayList<>();
     protected Player winner;
 
-    public GameHistoryFile(Player firstPlayer, Player secondPlayer) {
+    public GameHistoryFile(long gameId, Player firstPlayer, Player secondPlayer) {
+        this.gameId = gameId;
         this.firstPlayer = firstPlayer;
         this.secondPlayer = secondPlayer;
     }
 
-    public abstract void createHistoryFile(String gameId);
+    public long getGameId() {
+        return gameId;
+    }
+
+    public abstract void createHistoryFile();
     public abstract void addStep(Step step);
     public abstract void setWinner(Player player);
 

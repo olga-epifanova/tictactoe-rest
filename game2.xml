@@ -3,11 +3,11 @@
     <Player id="1" name="Ольга" symbol="X"/>
     <Player id="2" name="Игрок2" symbol="O"/>
     <Game>
-        <Step num="1" playerId="1">2 2</Step>
+        <Step num="1" playerId="1">1 2</Step>
         <Step num="2" playerId="2">1 1</Step>
-        <Step num="3" playerId="1">2 1</Step>
+        <Step num="3" playerId="1">2 2</Step>
         <Step num="4" playerId="2">3 3</Step>
-        <Step num="5" playerId="1">2 3</Step>
+        <Step num="5" playerId="1">3 2</Step>
     </Game>
     <GameResult>
         <Player id="1" name="Ольга" symbol="X"/>

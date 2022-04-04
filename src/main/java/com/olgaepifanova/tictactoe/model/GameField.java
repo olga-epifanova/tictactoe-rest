@@ -14,7 +14,7 @@ public class GameField {
     }
 
     public void setCell(int x, int y, char sign) {
-        cells[y][x] = sign;
+        cells[y-1][x-1] = sign;
     }
 
     public char getCell(int x, int y) {

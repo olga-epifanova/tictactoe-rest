@@ -10,12 +10,12 @@ import java.io.IOException;
 
 public class GameHistoryJSON extends GameHistoryFile {
 
-    public GameHistoryJSON(Player firstPlayer, Player secondPlayer) {
-        super(firstPlayer, secondPlayer);
+    public GameHistoryJSON(long gameId, Player firstPlayer, Player secondPlayer) {
+        super(gameId, firstPlayer, secondPlayer);
     }
 
     @Override
-    public void createHistoryFile(String gameId) {
+    public void createHistoryFile() {
 
         JSONObject firstPlayerObj = new JSONObject();
         addPlayer(firstPlayer, firstPlayerObj);
@@ -60,7 +60,7 @@ public class GameHistoryJSON extends GameHistoryFile {
         int num = 1;
         for (Step step : steps) {
             JSONObject stepJson = new JSONObject();
-            String playerId = "" + step.getPlayer().getplayerNumber();
+            String playerId = "" + step.getPlayer().getPlayerNumber();
             stepJson.put("num", num++);
             stepJson.put("playerId", playerId);
             stepJson.put("coordinateX", step.getCoordinateX());
@@ -70,7 +70,7 @@ public class GameHistoryJSON extends GameHistoryFile {
     }
 
     private void addPlayer(Player player, JSONObject playerObj) {
-        playerObj.put("id", player.getplayerNumber());
+        playerObj.put("id", player.getPlayerNumber());
         playerObj.put("name", player.getPlayerName());
         playerObj.put("symbol", "" + player.getPlayerSign());
     }

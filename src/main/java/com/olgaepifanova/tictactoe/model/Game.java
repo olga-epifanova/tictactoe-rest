@@ -5,13 +5,11 @@ public class Game {
     private final Player firstPlayer;
     private final Player secondPlayer;
     private final GameField gameField;
-    private Player currentPlayer;
 
-    public Game(Player firstPlayer, Player secondPlayer) {
+    public Game(Player firstPlayer, Player secondPlayer, GameField gameField) {
         this.firstPlayer = firstPlayer;
         this.secondPlayer = secondPlayer;
-        this.gameField = new GameField();
-        this.currentPlayer = firstPlayer;
+        this.gameField = gameField;
     }
 
     public GameField getGameField() {
@@ -26,15 +24,7 @@ public class Game {
         return secondPlayer;
     }
 
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    public void setCell(int x, int y) {
-        gameField.setCell(x-1, y-1, currentPlayer.getPlayerSign());
-    }
-
-    public boolean hasWinner() {
+    public boolean hasWinner(Player currentPlayer) {
         char playerSign = currentPlayer.getPlayerSign();
         for (int i = 0; i < 3; i++) {
             if ((gameField.getCell(i, 0) == playerSign && gameField.getCell(i, 1) == playerSign && gameField.getCell(i, 2) == playerSign) ||
@@ -53,15 +43,6 @@ public class Game {
     public boolean isBusyCell(int x, int y) {
         char defaultCellSign = GameField.getDefaultCellSign();
         return gameField.getCell(x - 1, y - 1) != defaultCellSign;
-    }
-
-    public void changeCurrentPlayer() {
-        int currentNumber = currentPlayer.getplayerNumber();
-        if (currentNumber == firstPlayer.getplayerNumber()) {
-            currentPlayer = secondPlayer;
-        } else {
-            currentPlayer = firstPlayer;
-        }
     }
 
 }

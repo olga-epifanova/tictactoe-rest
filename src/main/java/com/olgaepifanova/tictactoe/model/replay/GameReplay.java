@@ -18,7 +18,7 @@ public abstract class GameReplay {
             int y = step.getCoordinateY();
             int x = step.getCoordinateX();
             char sign = step.getPlayer().getPlayerSign();
-            gameField.setCell(x - 1, y - 1, sign);
+            gameField.setCell(x, y, sign);
             char[][] cells = copyArr(gameField.getCells());
             CurrentGameState gameState = new CurrentGameState(step.getPlayer(), cells);
             gameHistoryList.add(gameState);

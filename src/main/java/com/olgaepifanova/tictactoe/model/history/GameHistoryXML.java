@@ -16,12 +16,12 @@ import java.io.File;
 
 public class GameHistoryXML extends GameHistoryFile {
 
-    public GameHistoryXML(Player firstPlayer, Player secondPlayer) {
-        super(firstPlayer, secondPlayer);
+    public GameHistoryXML(long gameId, Player firstPlayer, Player secondPlayer) {
+        super(gameId, firstPlayer, secondPlayer);
     }
 
     @Override
-    public void createHistoryFile(String gameId) {
+    public void createHistoryFile() {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
@@ -62,7 +62,7 @@ public class GameHistoryXML extends GameHistoryFile {
         int num = 1;
         for (Step step : steps) {
             Element stepElement = doc.createElement("Step");
-            String playerId = "" + step.getPlayer().getplayerNumber();
+            String playerId = "" + step.getPlayer().getPlayerNumber();
             stepElement.setAttribute("num", "" + num++);
             stepElement.setAttribute("playerId", "" + playerId);
             String coordinates = step.getCoordinateX() + " " + step.getCoordinateY();
@@ -73,7 +73,7 @@ public class GameHistoryXML extends GameHistoryFile {
 
     private void addPlayer(Player player, Document doc, Element elem) {
         Element playerElement = doc.createElement("Player");
-        playerElement.setAttribute("id", "" + player.getplayerNumber());
+        playerElement.setAttribute("id", "" + player.getPlayerNumber());
         playerElement.setAttribute("name", player.getPlayerName());
         playerElement.setAttribute("symbol", "" + player.getPlayerSign());
         elem.appendChild(playerElement);

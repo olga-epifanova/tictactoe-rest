@@ -7,7 +7,6 @@ import com.olgaepifanova.tictactoe.service.GameService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/gameplay")
@@ -24,29 +23,29 @@ public class GameController {
     public ResponseEntity<String> createGame(@RequestParam String firstPlayerName,
                                              @RequestParam String secondPlayerName) {
 
-        UUID uuid = service.createGame(firstPlayerName, secondPlayerName);
-        return ResponseEntity.ok(uuid.toString());
+        Long gameID = service.createGame(firstPlayerName, secondPlayerName);
+        return ResponseEntity.ok(gameID.toString());
     }
 
-    // http://localhost:8080/gameplay/make-move/8c31a0b8-7b34-4b2d-ad6a-6d09edaf43f4?x=1&y=1
+    // http://localhost:8080/gameplay/make-move/1?x=1&y=1
     @PutMapping(value = "/make-move/{gameId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameResponse> makeMove(@RequestParam int x,
                                                  @RequestParam int y,
-                                                 @PathVariable UUID gameId) {
+                                                 @PathVariable Long gameId) {
 
         GameResponse gameResponse = service.makeMove(x, y, gameId);
         return ResponseEntity.ok(gameResponse);
     }
 
-    // http://localhost:8080/gameplay/current-game-state/8c31a0b8-7b34-4b2d-ad6a-6d09edaf43f4
+    // http://localhost:8080/gameplay/current-game-state/1
     @GetMapping(value = "/current-game-state/{gameId}")
-    public ResponseEntity<CurrentGameState> getCurrentGameState(@PathVariable UUID gameId) {
+    public ResponseEntity<CurrentGameState> getCurrentGameState(@PathVariable Long gameId) {
 
         CurrentGameState currentGameState = service.getCurrentGameState(gameId);
         return ResponseEntity.ok(currentGameState);
     }
 
-    // http://localhost:8080/gameplay/replay-game?fileName=game8c31a0b8-7b34-4b2d-ad6a-6d09edaf43f4.json
+    // http://localhost:8080/gameplay/replay-game?fileName=game1.json
     @GetMapping(value = "/replay-game")
     public ResponseEntity<GameHistory> getGameHistory(@RequestParam String fileName) {
         GameHistory gameHistory = service.getGameHistory(fileName);

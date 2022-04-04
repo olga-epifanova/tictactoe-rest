@@ -14,7 +14,7 @@
     "Game": {"Step": [
         {
             "coordinateY": 2,
-            "coordinateX": 2,
+            "coordinateX": 1,
             "num": 1,
             "playerId": "1"
         },
@@ -25,7 +25,7 @@
             "playerId": "2"
         },
         {
-            "coordinateY": 1,
+            "coordinateY": 2,
             "coordinateX": 2,
             "num": 3,
             "playerId": "1"
@@ -37,8 +37,8 @@
             "playerId": "2"
         },
         {
-            "coordinateY": 3,
-            "coordinateX": 2,
+            "coordinateY": 2,
+            "coordinateX": 3,
             "num": 5,
             "playerId": "1"
         }

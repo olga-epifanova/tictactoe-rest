@@ -1,5 +1,7 @@
 package com.olgaepifanova.tictactoe.service;
 
+import com.olgaepifanova.tictactoe.dao.IGameDao;
+import com.olgaepifanova.tictactoe.dao.IStepDao;
 import com.olgaepifanova.tictactoe.dto.CurrentGameState;
 import com.olgaepifanova.tictactoe.dto.GameHistory;
 import com.olgaepifanova.tictactoe.dto.GameResponse;
@@ -7,10 +9,7 @@ import com.olgaepifanova.tictactoe.dto.GameStatus;
 import com.olgaepifanova.tictactoe.exception.CellIsNotFreeException;
 import com.olgaepifanova.tictactoe.exception.GameNotFoundException;
 import com.olgaepifanova.tictactoe.exception.InvalidCoordinateValuesException;
-import com.olgaepifanova.tictactoe.model.FileResultWriter;
-import com.olgaepifanova.tictactoe.model.Game;
-import com.olgaepifanova.tictactoe.model.Player;
-import com.olgaepifanova.tictactoe.model.Step;
+import com.olgaepifanova.tictactoe.model.*;
 import com.olgaepifanova.tictactoe.model.history.GameHistoryFile;
 import com.olgaepifanova.tictactoe.model.history.GameHistoryJSON;
 import com.olgaepifanova.tictactoe.model.history.GameHistoryXML;
@@ -22,38 +21,37 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
 
-    private Map<UUID, Game> gameMap = new ConcurrentHashMap<>();
-    private List<GameHistoryFile> gameHistoryList = new ArrayList<>();
+    private final IGameDao gameDao;
+    private final IStepDao stepDao;
 
-    public UUID createGame(String firstPlayerName,
-                           String secondPlayerName) {
-
-        Player firstPlayer = new Player(1, firstPlayerName, 'X');
-        Player secondPlayer = new Player(2, secondPlayerName, 'O');
-        gameHistoryList.add(new GameHistoryXML(firstPlayer, secondPlayer));
-        gameHistoryList.add(new GameHistoryJSON(firstPlayer, secondPlayer));
-
-        Game game = new Game(firstPlayer, secondPlayer);
-        UUID uuid = UUID.randomUUID();
-
-        gameMap.put(uuid, game);
-
-        return uuid;
+    public GameService(IGameDao gameDao, IStepDao stepDao) {
+        this.gameDao = gameDao;
+        this.stepDao = stepDao;
     }
 
-    public GameResponse makeMove(int x, int y, UUID gameId) {
-        Game game = gameMap.get(gameId);
+    private List<GameHistoryFile> gameHistoryList = new ArrayList<>();
 
-        if (game == null) {
-            throw new GameNotFoundException();
-        }
+    public Long createGame(String firstPlayerName,
+                           String secondPlayerName) {
+
+        Player firstPlayer = new Player(1, firstPlayerName, 'X', true);
+        Player secondPlayer = new Player(2, secondPlayerName, 'O', false);
+
+        Game game = new Game(firstPlayer, secondPlayer, new GameField());
+
+        Long gameId = gameDao.create(game);
+        gameHistoryList.add(new GameHistoryXML(gameId, firstPlayer, secondPlayer));
+        gameHistoryList.add(new GameHistoryJSON(gameId, firstPlayer, secondPlayer));
+
+        return gameId;
+    }
+
+    public GameResponse makeMove(int x, int y, Long gameId) {
+        Game game = gameDao.getGame(gameId);
 
         if (x < 1 || x > 3 || y < 1 || y > 3) {
             throw new InvalidCoordinateValuesException();
@@ -63,39 +61,55 @@ public class GameService {
             throw new CellIsNotFreeException();
         }
 
-        game.setCell(x, y);
-        Step step = new Step(game.getCurrentPlayer(), x, y);
-        gameHistoryList.forEach((GameHistoryFile gameHistory) -> gameHistory.addStep(step));
+        Player currentPlayer = (game.getFirstPlayer().isCurrentPlayer()) ? game.getFirstPlayer() : game.getSecondPlayer();
 
-        if (game.hasWinner()) {
-            Game currentGame = gameMap.remove(gameId);
-            Player currentPlayer = currentGame.getCurrentPlayer();
+        game.getGameField().setCell(x, y, currentPlayer.getPlayerSign());
+        Step step = new Step(currentPlayer, x, y);
+        gameHistoryList.forEach(gameHistory -> {
+            if (gameHistory.getGameId() == gameId) {
+                gameHistory.addStep(step);
+            }
+        });
+        Long stepId = stepDao.create(step, gameId, currentPlayer.getPlayerId());
+
+        if (game.hasWinner(currentPlayer)) {
+            gameDao.updateGameStatus(gameId, GameStatus.WIN);
             FileResultWriter.writeFile("Победитель: " + currentPlayer.getPlayerName());
-            gameHistoryList.forEach((GameHistoryFile gameHistory) -> gameHistory.setWinner(currentPlayer));
-            gameHistoryList.forEach((GameHistoryFile gameHistory) -> gameHistory.createHistoryFile(gameId.toString()));
-            return new GameResponse(GameStatus.WIN, currentPlayer, currentGame.getGameField().getCells());
+            gameHistoryList.forEach(gameHistory -> {
+                if (gameHistory.getGameId() == gameId) {
+                    gameHistory.setWinner(currentPlayer);
+                    gameHistory.createHistoryFile();
+                }
+            });
+            return new GameResponse(GameStatus.WIN, currentPlayer, game.getGameField().getCells());
         }
 
         if (game.isDraw()) {
-            Game currentGame = gameMap.remove(gameId);
-            gameHistoryList.forEach((GameHistoryFile gameHistory) -> gameHistory.setWinner(null));
-            gameHistoryList.forEach((GameHistoryFile gameHistory) -> gameHistory.createHistoryFile(gameId.toString()));
-            return new GameResponse(GameStatus.DRAW, currentGame.getGameField().getCells());
+            gameDao.updateGameStatus(gameId, GameStatus.DRAW);
+            gameHistoryList.forEach(gameHistory -> {
+                if (gameHistory.getGameId() == gameId) {
+                    gameHistory.setWinner(null);
+                    gameHistory.createHistoryFile();
+                }
+            });
+            return new GameResponse(GameStatus.DRAW, game.getGameField().getCells());
         }
 
-        game.changeCurrentPlayer();
+        gameDao.changeCurrentPlayer(game);
 
         return new GameResponse(GameStatus.MOVE_DONE, game.getGameField().getCells());
     }
 
-    public CurrentGameState getCurrentGameState(UUID gameId) {
+    public CurrentGameState getCurrentGameState(Long gameId) {
 
-        Game game = gameMap.get(gameId);
+        Game game = gameDao.getGame(gameId);
+        Player currentPlayer = (game.getFirstPlayer().isCurrentPlayer()) ? game.getFirstPlayer() : game.getSecondPlayer();
+
         if (game == null) {
             throw new GameNotFoundException();
         }
 
-        return new CurrentGameState(game.getCurrentPlayer(), game.getGameField().getCells());
+        return new CurrentGameState(currentPlayer, game.getGameField().getCells());
     }
 
     public GameHistory getGameHistory(String fileName) {
